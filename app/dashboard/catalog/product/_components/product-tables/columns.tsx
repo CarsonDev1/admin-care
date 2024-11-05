@@ -37,7 +37,12 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     accessorKey: 'description',
-    header: 'DESCRIPTION'
+    header: 'DESCRIPTION',
+    cell: ({ row }) => (
+      <div className="max-w-[150px] truncate">
+        {row.getValue('description')}
+      </div>
+    )
   },
   {
     accessorKey: 'warranty_info',
@@ -48,27 +53,11 @@ export const columns: ColumnDef<Product>[] = [
       ) as Product['warranty_info'];
       return (
         <div className="space-y-1 text-sm">
-          <div>
-            <strong>Conditions:</strong> {warranty.warranty_conditions}
-          </div>
-          <div>
-            <strong>Duration:</strong> {warranty.warranty_duration}
-          </div>
-          <div>
-            <strong>Non-Warranty Cases:</strong> {warranty.non_warranty_cases}
-          </div>
-          <div>
-            <strong>Repair Time:</strong> {warranty.repair_time}
-          </div>
-          <div>
-            <strong>Special Offer:</strong> {warranty.special_offer}
-          </div>
-          <div>
-            <strong>Warranty Period:</strong> {warranty.warranty_period}
-          </div>
-          <div>
-            <strong>Repair Duration:</strong> {warranty.repair_duration}
-          </div>
+          {warranty.map((item, index) => (
+            <div key={index}>
+              <strong>Info {index + 1}:</strong> {item.content}
+            </div>
+          ))}
         </div>
       );
     }

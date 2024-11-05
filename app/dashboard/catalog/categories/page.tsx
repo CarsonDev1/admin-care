@@ -9,8 +9,8 @@ import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { SearchParams } from 'nuqs/parsers';
 import { Suspense } from 'react';
-import ProductListingPage from './_components/product-listing';
-import ProductTableAction from './_components/product-tables/product-table-action';
+import ProductListingPage from './_components/category-listing';
+import ProductTableAction from './_components/categories-tables/category-table-action';
 
 export const metadata = {
   title: 'Dashboard: Categories'

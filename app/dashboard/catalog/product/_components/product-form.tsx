@@ -21,10 +21,11 @@ import {
 } from '@/components/ui/select';
 import { Product } from '@/constants/mock-api';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, Controller, useWatch } from 'react-hook-form';
+import { useForm, Controller, useWatch, useFieldArray } from 'react-hook-form';
 import * as z from 'zod';
 import dynamic from 'next/dynamic';
 import 'react-quill/dist/quill.snow.css';
+import { FiTrash, FiPlus } from 'react-icons/fi';
 
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
@@ -36,7 +37,6 @@ const ACCEPTED_IMAGE_TYPES = [
   'image/webp'
 ];
 
-// Define toolbar options for ReactQuill
 const toolbarOptions = [
   [{ header: [1, 2, 3, false] }],
   [{ font: [] }],
@@ -55,7 +55,7 @@ const toolbarOptions = [
 const formSchema = z.object({
   image: z
     .any()
-    .refine((files) => files?.length == 1, 'Image is required.')
+    .refine((files) => files?.length === 1, 'Image is required.')
     .refine(
       (files) => files?.[0]?.size <= MAX_FILE_SIZE,
       `Max file size is 5MB.`
@@ -75,39 +75,25 @@ const formSchema = z.object({
   }),
   warrantyAvailable: z.string().nonempty('Select if warranty is available'),
   warranty_info: z
-    .object({
-      warranty_conditions: z.string().min(5, {
-        message: 'Warranty conditions must be at least 5 characters.'
-      }),
-      warranty_duration: z.string().min(5, {
-        message: 'Warranty duration must be at least 5 characters.'
-      }),
-      non_warranty_cases: z.string().min(5, {
-        message: 'Non-warranty cases must be at least 5 characters.'
-      }),
-      repair_time: z.string().min(5, {
-        message: 'Repair time must be at least 5 characters.'
-      }),
-      special_offer: z.string().min(5, {
-        message: 'Special offer must be at least 5 characters.'
-      }),
-      warranty_period: z.string().min(2, {
-        message: 'Warranty period must be at least 2 characters.'
-      }),
-      repair_duration: z.string().min(2, {
-        message: 'Repair duration must be at least 2 characters.'
+    .array(
+      z.object({
+        content: z.string().min(5, {
+          message: 'Content must be at least 5 characters.'
+        })
       })
-    })
+    )
     .optional()
 });
+
+interface ProductFormProps {
+  initialData: Product | null;
+  pageTitle: string;
+}
 
 export default function ProductForm({
   initialData,
   pageTitle
-}: {
-  initialData: Product | null;
-  pageTitle: string;
-}) {
+}: ProductFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -116,9 +102,14 @@ export default function ProductForm({
       price: initialData?.price || 0,
       discount_price: initialData?.discount_price || 0,
       description: initialData?.description || '',
-      warrantyAvailable: 'no',
-      warranty_info: initialData?.warranty_info || {}
+      warrantyAvailable: 'yes',
+      warranty_info: initialData?.warranty_info || []
     }
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: 'warranty_info'
   });
 
   const warrantyAvailable = useWatch({
@@ -126,9 +117,9 @@ export default function ProductForm({
     name: 'warrantyAvailable'
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
     console.log(values);
-  }
+  };
 
   const modules = {
     toolbar: toolbarOptions
@@ -311,119 +302,64 @@ export default function ProductForm({
             />
 
             {warrantyAvailable === 'yes' && (
-              <>
-                <div className="grid grid-cols-1 gap-6 rounded-md border border-slate-200 p-3 shadow-md md:grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="warranty_info.warranty_conditions"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Warranty Conditions</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Enter warranty conditions"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="warranty_info.warranty_duration"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Warranty Duration</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Enter warranty duration"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="warranty_info.non_warranty_cases"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Non-Warranty Cases</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Enter non-warranty cases"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="warranty_info.repair_time"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Repair Time</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter repair time" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="warranty_info.special_offer"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Special Offer</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter special offer" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="warranty_info.warranty_period"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Warranty Period</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Enter warranty period (e.g., 12 months)"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="warranty_info.repair_duration"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Repair Duration</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Enter repair duration (e.g., 30-60 mins)"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </>
+              <div className="space-y-4 rounded-md border border-slate-200 p-3">
+                <h3 className="mb-2">Warranty</h3>
+
+                {fields.map((item, index) => (
+                  <div
+                    key={item.id}
+                    className="flex flex-col space-y-4 rounded-md border p-4"
+                  >
+                    <FormField
+                      control={form.control}
+                      name={`warranty_info.${index}.content`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Warranty Info {index + 1}</FormLabel>
+                          <FormControl>
+                            <Controller
+                              control={form.control}
+                              name={`warranty_info.${index}.content`}
+                              render={({ field }) => (
+                                <ReactQuill
+                                  value={field.value}
+                                  onChange={field.onChange}
+                                  placeholder="Enter warranty details"
+                                  modules={modules}
+                                  formats={formats}
+                                />
+                              )}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <Button
+                      type="button"
+                      onClick={() => remove(index)}
+                      className="mt-4 self-end"
+                    >
+                      <FiTrash className="h-5 w-5" />
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  onClick={() => append({ content: '' })}
+                  className="mt-2"
+                >
+                  <FiPlus className="mr-2 h-5 w-5" /> Add Warranty Info
+                </Button>
+              </div>
             )}
 
-            <Button type="submit">Add Product</Button>
+            <div className="flex items-center justify-center">
+              <Button type="submit" className="font-semibold">
+                Add Product
+              </Button>
+            </div>
           </form>
         </Form>
       </CardContent>

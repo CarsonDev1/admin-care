@@ -1,6 +1,6 @@
 'use client';
 
-import { CrossIcon, UploadIcon } from 'lucide-react';
+import { CircleX, UploadIcon } from 'lucide-react';
 import Image from 'next/image';
 import * as React from 'react';
 import Dropzone, {
@@ -246,7 +246,7 @@ export function FileUploader(props: FileUploaderProps) {
       </Dropzone>
       {files?.length ? (
         <ScrollArea className="h-fit w-full px-3">
-          <div className="max-h-48 space-y-4">
+          <div className="flex max-h-48 items-center gap-4 space-y-4">
             {files?.map((file, index) => (
               <FileCard
                 key={index}
@@ -270,8 +270,8 @@ interface FileCardProps {
 
 function FileCard({ file, progress, onRemove }: FileCardProps) {
   return (
-    <div className="relative flex items-center space-x-4">
-      <div className="flex flex-1 space-x-4">
+    <div className="relative flex flex-wrap items-center space-x-4">
+      <div className="flex items-center gap-4">
         {isFileWithPreview(file) ? (
           <Image
             src={file.preview}
@@ -284,7 +284,7 @@ function FileCard({ file, progress, onRemove }: FileCardProps) {
         ) : null}
         <div className="flex w-full flex-col gap-2">
           <div className="space-y-px">
-            <p className="line-clamp-1 text-sm font-medium text-foreground/80">
+            <p className="line-clamp-1 max-w-[200px] truncate text-sm font-medium text-foreground/80">
               {file.name}
             </p>
             <p className="text-xs text-muted-foreground">
@@ -302,7 +302,7 @@ function FileCard({ file, progress, onRemove }: FileCardProps) {
           className="size-7"
           onClick={onRemove}
         >
-          <CrossIcon className="size-4 " aria-hidden="true" />
+          <CircleX className="size-4 " aria-hidden="true" />
           <span className="sr-only">Remove file</span>
         </Button>
       </div>

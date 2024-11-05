@@ -5,8 +5,6 @@
 import { faker } from '@faker-js/faker';
 import { matchSorter } from 'match-sorter'; // For filtering
 
-// Define the shape of User data
-
 type Gender = 'male' | 'female';
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -32,9 +30,8 @@ export type User = {
 
 // Mock user data store
 export const fakeUsers = {
-  records: [] as User[], // Holds the list of user objects
+  records: [] as User[],
 
-  // Initialize with sample data
   initialize() {
     const sampleUsers: User[] = [];
     function generateRandomUserData(id: number): User {
@@ -102,7 +99,6 @@ export const fakeUsers = {
       };
     }
 
-    // Generate remaining records
     for (let i = 1; i <= 20; i++) {
       sampleUsers.push(generateRandomUserData(i));
     }
@@ -110,7 +106,6 @@ export const fakeUsers = {
     this.records = sampleUsers;
   },
 
-  // Get all users with optional gender filtering and search
   async getAll({
     genders = [],
     search
@@ -119,13 +114,9 @@ export const fakeUsers = {
     search?: string;
   }) {
     let users = [...this.records];
-
-    // Filter users based on selected genders
     if (genders.length > 0) {
       users = users.filter((user) => genders.includes(user.gender));
     }
-
-    // Search functionality across multiple fields
     if (search) {
       users = matchSorter(users, search, {
         keys: [
@@ -140,11 +131,9 @@ export const fakeUsers = {
         ]
       });
     }
-
     return users;
   },
 
-  // Get paginated results with optional gender filtering and search
   async getUsers({
     page = 1,
     limit = 10,
@@ -157,18 +146,12 @@ export const fakeUsers = {
     search?: string;
   }) {
     const gendersArray = genders ? genders.split('.') : [];
-    console.log('gendersArray', gendersArray);
     const allUsers = await this.getAll({ genders: gendersArray, search });
     const totalUsers = allUsers.length;
-
-    // Pagination logic
     const offset = (page - 1) * limit;
     const paginatedUsers = allUsers.slice(offset, offset + limit);
-
-    // Mock current time
     const currentTime = new Date().toISOString();
 
-    // Return paginated response
     return {
       success: true,
       time: currentTime,
@@ -181,10 +164,8 @@ export const fakeUsers = {
   }
 };
 
-// Initialize sample users
 fakeUsers.initialize();
 
-// Define the shape of Product data
 export type Product = {
   photo_url: string;
   name: string;
@@ -195,22 +176,12 @@ export type Product = {
   category: string;
   updated_at: string;
   discount_price: number;
-  warranty_info: {
-    warranty_conditions: string;
-    warranty_duration: string;
-    non_warranty_cases: string;
-    repair_time: string;
-    special_offer: string;
-    warranty_period: string;
-    repair_duration: string;
-  };
+  warranty_info: Array<{ content: string }>;
 };
 
-// Mock product data store
 export const fakeProducts = {
-  records: [] as Product[], // Holds the list of product objects
+  records: [] as Product[],
 
-  // Initialize with sample data
   initialize() {
     const sampleProducts: Product[] = [];
     function generateRandomProductData(id: number): Product {
@@ -239,21 +210,24 @@ export const fakeProducts = {
         photo_url: `https://api.slingacademy.com/public/sample-products/${id}.png`,
         category: faker.helpers.arrayElement(categories),
         updated_at: faker.date.recent().toISOString(),
-        warranty_info: {
-          warranty_conditions: '12 months for manufacturing defects',
-          warranty_duration: '6 months for display issues',
-          non_warranty_cases:
-            'Physical damage, water damage, unauthorized repairs',
-          repair_time: '1-3 hours',
-          special_offer:
-            '50% off screen replacement if broken within first year',
-          warranty_period: '12 months',
-          repair_duration: '30-60 minutes'
-        }
+        warranty_info: [
+          { content: '12 months for manufacturing defects' },
+          { content: '6 months for display issues' },
+          {
+            content:
+              'Physical damage, water damage, unauthorized repairs are not covered'
+          },
+          { content: 'Repair time is 1-3 hours' },
+          {
+            content:
+              'Special offer: 50% off screen replacement if broken within the first year'
+          },
+          { content: 'Warranty period is 12 months' },
+          { content: 'Repair duration is 30-60 minutes' }
+        ]
       };
     }
 
-    // Generate remaining records
     for (let i = 1; i <= 20; i++) {
       sampleProducts.push(generateRandomProductData(i));
     }
@@ -261,7 +235,6 @@ export const fakeProducts = {
     this.records = sampleProducts;
   },
 
-  // Get all products with optional category filtering and search
   async getAll({
     categories = [],
     search
@@ -270,25 +243,19 @@ export const fakeProducts = {
     search?: string;
   }) {
     let products = [...this.records];
-
-    // Filter products based on selected categories
     if (categories.length > 0) {
       products = products.filter((product) =>
         categories.includes(product.category)
       );
     }
-
-    // Search functionality across multiple fields
     if (search) {
       products = matchSorter(products, search, {
         keys: ['name', 'description', 'category']
       });
     }
-
     return products;
   },
 
-  // Get paginated results with optional category filtering and search
   async getProducts({
     page = 1,
     limit = 10,
@@ -307,15 +274,10 @@ export const fakeProducts = {
       search
     });
     const totalProducts = allProducts.length;
-
-    // Pagination logic
     const offset = (page - 1) * limit;
     const paginatedProducts = allProducts.slice(offset, offset + limit);
-
-    // Mock current time
     const currentTime = new Date().toISOString();
 
-    // Return paginated response
     return {
       success: true,
       time: currentTime,
@@ -327,11 +289,8 @@ export const fakeProducts = {
     };
   },
 
-  // Get a specific product by its ID
   async getProductById(id: number) {
-    await delay(1000); // Simulate a delay
-
-    // Find the product by its ID
+    await delay(1000);
     const product = this.records.find((product) => product.id === id);
 
     if (!product) {
@@ -341,7 +300,6 @@ export const fakeProducts = {
       };
     }
 
-    // Mock current time
     const currentTime = new Date().toISOString();
 
     return {
@@ -353,5 +311,116 @@ export const fakeProducts = {
   }
 };
 
-// Initialize sample products
 fakeProducts.initialize();
+
+export type Category = {
+  id: number;
+  name: string;
+  products?: Product[];
+  subcategories?: Category[];
+};
+
+export const fakeCategories = {
+  records: [] as Category[],
+
+  initialize() {
+    this.records = [
+      {
+        id: 2,
+        name: 'Danh Mục Sản Phẩm',
+        subcategories: [
+          {
+            id: 3,
+            name: 'Điện thoại',
+            subcategories: [
+              {
+                id: 4,
+                name: 'Samsung',
+                products: fakeProducts.records.slice(0, 2) // Example products
+              },
+              {
+                id: 5,
+                name: 'iPhone',
+                products: fakeProducts.records.slice(2, 4)
+              }
+            ]
+          },
+          {
+            id: 6,
+            name: 'Máy tính bảng',
+            subcategories: [
+              {
+                id: 7,
+                name: 'iPad',
+                products: fakeProducts.records.slice(4, 6)
+              },
+              {
+                id: 8,
+                name: 'Xiaomi',
+                products: fakeProducts.records.slice(6, 8)
+              }
+            ]
+          }
+        ]
+      }
+    ];
+  },
+
+  async getCategoryById(id: number) {
+    await delay(1000);
+    const category = this.records.find((category) => category.id === id);
+
+    if (!category) {
+      return {
+        success: false,
+        message: `Category with ID ${id} not found`
+      };
+    }
+
+    const currentTime = new Date().toISOString();
+
+    return {
+      success: true,
+      time: currentTime,
+      message: `Category with ID ${id} found`,
+      category
+    };
+  },
+
+  async getAll({ search }: { search?: string }) {
+    let categories = [...this.records];
+    if (search) {
+      categories = matchSorter(categories, search, { keys: ['name'] });
+    }
+    return categories;
+  },
+
+  async getCategories({
+    page = 1,
+    limit = 5,
+    search
+  }: {
+    page?: number;
+    limit?: number;
+    search?: string;
+  }) {
+    await delay(1000);
+    const allCategories = await this.getAll({ search });
+    const totalCategories = allCategories.length;
+    const offset = (page - 1) * limit;
+    const paginatedCategories = allCategories.slice(offset, offset + limit);
+    const currentTime = new Date().toISOString();
+
+    return {
+      success: true,
+      time: currentTime,
+      message: 'Sample data for testing and learning purposes',
+      total_categories: totalCategories,
+      offset,
+      limit,
+      categories: paginatedCategories
+    };
+  }
+};
+
+fakeCategories.initialize();
