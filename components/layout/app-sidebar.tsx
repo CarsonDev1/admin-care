@@ -160,12 +160,12 @@ export default function AppSidebar({
                     <Avatar className="h-8 w-8 rounded-lg">
                       <AvatarImage src="" alt="" />
                       <AvatarFallback className="rounded-lg">
-                        'CN'
+                        {'CN'}
                       </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">''</span>
-                      <span className="truncate text-xs">''</span>
+                      <span className="truncate font-semibold">{'CN'}</span>
+                      <span className="truncate text-xs">{'CN'}</span>
                     </div>
                     <ChevronsUpDown className="ml-auto size-4" />
                   </SidebarMenuButton>
@@ -181,12 +181,12 @@ export default function AppSidebar({
                       <Avatar className="h-8 w-8 rounded-lg">
                         <AvatarImage src="" alt="" />
                         <AvatarFallback className="rounded-lg">
-                          'CN'
+                          {'CN'}
                         </AvatarFallback>
                       </Avatar>
                       <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="truncate font-semibold">''</span>
-                        <span className="truncate text-xs">''</span>
+                        <span className="truncate font-semibold">{'CN'}</span>
+                        <span className="truncate text-xs">{'CN'}</span>
                       </div>
                     </div>
                   </DropdownMenuLabel>
